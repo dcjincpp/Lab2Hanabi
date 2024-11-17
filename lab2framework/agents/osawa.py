@@ -7,6 +7,8 @@ class InnerStatePlayer(agent.Agent):
     def __init__(self, name, pnr):
         self.name = name
         self.explanation = []
+
+    #utilize trash and played for process of elimination for more information of hand
     def get_action(self, nr, hands, knowledge, trash, played, board, valid_actions, hints, hits, cards_left):
         my_knowledge = knowledge[nr]
         
@@ -80,6 +82,7 @@ class OuterStatePlayer(agent.Agent):
                     if card.is_playable(board):                              
                         playables.append((player,card_index))
         
+        #sorts the playables by rank in descending order (5,4,3,2,1)
         playables.sort(key=lambda which: -hands[which[0]][which[1]].rank)
         while playables and hints > 0:
             player,card_index = playables[0]
@@ -97,12 +100,13 @@ class OuterStatePlayer(agent.Agent):
             t = None
             if hinttype:
                 t = random.choice(hinttype)
-            
+            #tells player which cards are a rank
             if t == HINT_RANK:
                 for i,card in enumerate(hands[player]):
                     if card.rank == hands[player][card_index].rank:
                         self.hints[(player,i)].add(HINT_RANK)
                 return Action(HINT_RANK, player=player, rank=hands[player][card_index].rank)
+            #tells player which cards are a color
             if t == HINT_COLOR:
                 for i,card in enumerate(hands[player]):
                     if card.color == hands[player][card_index].color:
