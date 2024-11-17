@@ -8,7 +8,6 @@ class InnerStatePlayer(agent.Agent):
         self.name = name
         self.explanation = []
 
-    #utilize trash and played for process of elimination for more information of hand
     def get_action(self, nr, hands, knowledge, trash, played, board, valid_actions, hints, hits, cards_left):
         my_knowledge = knowledge[nr]
         
@@ -47,6 +46,8 @@ class OuterStatePlayer(agent.Agent):
         self.hints = {}
         self.pnr = pnr
         self.explanation = []
+
+    #utilize trash and played for process of elimination for more information of hand
     def get_action(self, nr, hands, knowledge, trash, played, board, valid_actions, hints, hits, cards_left):
 
         for player,hand in enumerate(hands):
