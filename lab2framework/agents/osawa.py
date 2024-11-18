@@ -176,6 +176,8 @@ class OuterStatePlayer(agent.Agent):
                 return Action(PLAY, card_index=i)
             if util.is_useless(k, board):    
                 potential_discards.append(i)
+            if util.maybe_playable(k, board) and util.probability(util.playable(board), k) > 0.5 and hits > 1:
+                return Action(PLAY, card_index=i)
         
         #discard one of the useless cards
         if potential_discards:
