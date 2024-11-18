@@ -146,8 +146,8 @@ class OuterStatePlayer(agent.Agent):
         #         print(my_knowledge[i][j], "\n")
         #     print("---------------------------", "\n")
 
-        for i in range(5):
-            for j in range(5):
+        for i in range(len(hands)):
+            for j in range(len(ALL_COLORS)):
                 for k in range(5):
                     if(my_knowledge[i][j][k] != 0):
                         my_knowledge[i][j][k] = card_map[j][k]
