@@ -67,7 +67,7 @@ class OuterStatePlayer(agent.Agent):
 
         for _,card in enumerate(trash):
             adjust_card_count(card_map, card.color, card.rank - 1, -1)
-            print(card)
+            #print("trash: ",card)
 #################################################################
         # for _, card in enumerate(played):
         #     adjust_card_count(card_map, card.color, card.rank - 1, -1)
@@ -107,14 +107,27 @@ class OuterStatePlayer(agent.Agent):
 
         #your hand
         my_knowledge = knowledge[nr]
-        print(card_map)
+        #print(card_map)
+        #print(my_knowledge, "\n")
 
         for i,k in enumerate(my_knowledge):
-            print(k)
-            print("---------------------------", "\n")
-            #for j,card in enumerate(my_knowledge[i]):
-                # print(card, "\n")
-                # print("---------------------------", "\n")
+            #print(i) #positions in hand
+            #print("-----------------------------------", "\n")
+            for j, color in enumerate(my_knowledge[i]):
+                #print(color, "\n")
+                #print("---------------------------", "\n")
+                for k in color:
+                    #print(k, "\n")
+                    if(my_knowledge[i][j][k] != 0):
+                        my_knowledge[i][j][k] = card_map[j][k]
+
+        #print(card_map, "\n")
+
+        # for i,k in enumerate(my_knowledge):
+        #     #print(i) #positions in hand
+        #     for j, color in enumerate(my_knowledge[i]):
+        #         print(color, "\n")
+        #     print("---------------------------")
 
         #goes through your potential hand and checks if something can be played while also checking and adding useless cards into an array
         potential_discards = []
