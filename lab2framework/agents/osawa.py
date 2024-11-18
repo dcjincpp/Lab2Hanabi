@@ -68,16 +68,16 @@ class OuterStatePlayer(agent.Agent):
         for _,card in enumerate(trash):
             adjust_card_count(card_map, card.color, card.rank - 1, -1)
             #print("trash: ",card)
-#################################################################
-        # for _, card in enumerate(played):
-        #     adjust_card_count(card_map, card.color, card.rank - 1, -1)
 
-        # for i, hand in enumerate(hands):
-        #         #if(i == nr):
-        #             #continue
-        #         for _, card in enumerate(hand):
-        #             adjust_card_count(card_map, card.color, card.rank - 1, -1)
-        
+        for _, card in enumerate(played):
+            adjust_card_count(card_map, card.color, card.rank - 1, -1)
+
+        for i, hand in enumerate(hands):
+                if(i == nr):
+                    continue
+                for _, card in enumerate(hand):
+                    adjust_card_count(card_map, card.color, card.rank - 1, -1)
+#################################################################
         # total_cards = 0
         # for color, ranks in card_map.items():
         #     # Sum up the counts for all ranks under this color
@@ -107,8 +107,12 @@ class OuterStatePlayer(agent.Agent):
 
         #your hand
         my_knowledge = knowledge[nr]
-        #print(card_map)
-        #print(my_knowledge, "\n")
+        # print(card_map[0])
+        # print(card_map[1])
+        # print(card_map[2])
+        # print(card_map[3])
+        # print(card_map[4])
+        # print(my_knowledge, "\n")
 
         for i,k in enumerate(my_knowledge):
             #print(i) #positions in hand
@@ -120,8 +124,30 @@ class OuterStatePlayer(agent.Agent):
                     #print(k, "\n")
                     if(my_knowledge[i][j][k] != 0):
                         my_knowledge[i][j][k] = card_map[j][k]
+                        # print("knowledge", my_knowledge[i][j][k], "\n")
+                        # print("map", card_map[j][k], "\n")
 
-        #print(card_map, "\n")
+        # for i in range(5):
+        #     for j in range(5):
+        #         print(my_knowledge[i][j], "\n")
+        #     print("---------------------------", "\n")
+
+        for i in range(5):
+            for j in range(5):
+                for k in range(5):
+                    if(my_knowledge[i][j][k] != 0):
+                        my_knowledge[i][j][k] = card_map[j][k]
+
+        # for i in range(5):
+        #     for j in range(5):
+        #         for k in range(5):
+        #             print("knowledge", my_knowledge[i][j][k], "\n")
+        #             print("card", card_map[j][k], "\n")
+        #         print("---------------------------", "\n")
+
+        # print(card_map, "\n")
+        # print("cardMap", card_map[0][3], "\n")
+        # print("Knowledge", my_knowledge[0][0][3], "\n")
 
         # for i,k in enumerate(my_knowledge):
         #     #print(i) #positions in hand
