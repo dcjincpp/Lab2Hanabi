@@ -72,6 +72,7 @@ def initial_knowledge():
         knowledge.append(COUNTS[:])
     return knowledge
     
+#hints added to knowledge
 def hint_color(knowledge, color, truth):
     result = []
     for col in ALL_COLORS:
@@ -234,12 +235,16 @@ class Game(object):
                     for rank in set([card[1] for card in self.hands[i]]):
                         valid.append(Action(HINT_RANK, player=i, rank=rank))
         return valid
+    #a turn
     def run(self, turns=-1):
         self.turn = 1
+        #while game is not over and we have not run out of turns
         while not self.done() and (turns < 0 or self.turn < turns):
             self.turn += 1
+            #last turn after deck is gone
             if not self.deck:
                 self.extra_turns += 1
+            #create your unknown (empty) hand
             hands = []
             for i, h in enumerate(self.hands):
                 if i == self.current_player:
@@ -248,6 +253,7 @@ class Game(object):
                     hands.append(h)
             valid = self.valid_actions()
             action = None
+            #while an action is not valid, get a new action
             while action not in valid:
                 action = self.players[self.current_player].get_action(self.current_player, hands, copy.deepcopy(self.knowledge), self.trash[:], self.played[:], self.board[:], valid, self.hints, self.hits, len(self.deck))
                 if action not in valid:
@@ -255,6 +261,7 @@ class Game(object):
             self.perform(action)
             self.current_player += 1
             self.current_player %= len(self.players)
+        #end game
         print("Game done, hits left:", self.hits, file=self.log)
         points = self.score()
         print("Points:", points, file=self.log)
