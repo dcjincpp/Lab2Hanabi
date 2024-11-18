@@ -21,19 +21,33 @@ class InnerStatePlayer(agent.Agent):
         if potential_discards:
             return Action(DISCARD, card_index=random.choice(potential_discards))
 
+        # Give a useful hint if hints are available and there are playable cards in other players' hands
         if hints > 0:
-            for player,hand in enumerate(hands):
-                if player != nr:
-                    for card_index,card in enumerate(hand):
-                        if card.is_playable(board):                              
-                            if random.random() < 0.5:
-                                return Action(HINT_COLOR, player=player, color=card.color)
-                            return Action(HINT_RANK, player=player, rank=card.rank)
+            best_hint = self.find_best_hint(hands, knowledge, board, nr)
+            if best_hint:
+                return best_hint
 
-            hints = util.filter_actions(HINT_COLOR, valid_actions) + util.filter_actions(HINT_RANK, valid_actions)
-            return random.choice(hints)
-
-        return random.choice(util.filter_actions(DISCARD, valid_actions))
+        # Discard the card with the lowest probability of being playable
+        probabilities = [
+            (i, util.probability(util.playable(board), k))
+            for i, k in enumerate(my_knowledge)
+        ]
+        probabilities.sort(key=lambda x: x[1])  # Sort by ascending probability
+        return Action(DISCARD, card_index=probabilities[0][0])
+    
+    def find_best_hint(self, hands, knowledge, board, nr):
+        """Find the most strategic hint to give to other players."""
+        for player, hand in enumerate(hands):
+            if player == nr:
+                continue  # Skip self
+            for card_index, card in enumerate(hand):
+                if card.is_playable(board):
+                    # Check if the player knows the card's rank or color
+                    if not util.has_property(util.has_color(card.color), knowledge[player][card_index]):
+                        return Action(HINT_COLOR, player=player, color=card.color)
+                    if not util.has_property(util.has_rank(card.rank), knowledge[player][card_index]):
+                        return Action(HINT_RANK, player=player, rank=card.rank)
+        return None
         
 def format_hint(h):
     if h == HINT_COLOR:
@@ -208,20 +222,24 @@ class OuterStatePlayer(agent.Agent):
             playables = playables[1:]
  
         if hints > 0:
-            hints = util.filter_actions(HINT_COLOR, valid_actions) + util.filter_actions(HINT_RANK, valid_actions)
-            hintgiven = random.choice(hints)
-            if hintgiven.type == HINT_COLOR:
-                for i,card in enumerate(hands[hintgiven.player]):
-                    if card.color == hintgiven.color:
-                        self.hints[(hintgiven.player,i)].add(HINT_COLOR)
-            else:
-                for i,card in enumerate(hands[hintgiven.player]):
-                    if card.rank == hintgiven.rank:
-                        self.hints[(hintgiven.player,i)].add(HINT_RANK)
-                
-            return hintgiven
-
-        return random.choice(util.filter_actions(DISCARD, valid_actions))
+            # Prioritize hinting about playable cards
+            for player, hand in enumerate(hands):
+                if player != nr:
+                    for card_index, card in enumerate(hand):
+                        if not util.has_property(util.has_color(card.color), knowledge[player][card_index]):
+                            self.hints[(player, card_index)].add(HINT_COLOR)
+                            return Action(HINT_COLOR, player=player, color=card.color)
+                        if not util.has_property(util.has_rank(card.rank), knowledge[player][card_index]):
+                            self.hints[(player, card_index)].add(HINT_RANK)
+                            return Action(HINT_RANK, player=player, rank=card.rank)
+            
+        # If no strategic hint is found, discard the least useful card
+        probabilities = [
+            (i, util.probability(util.playable(board), k))
+            for i, k in enumerate(my_knowledge)
+        ]
+        probabilities.sort(key=lambda x: x[1])  # Sort by ascending probability
+        return Action(DISCARD, card_index=probabilities[0][0])
 
     def inform(self, action, player):
         if action.type in [PLAY, DISCARD]:
